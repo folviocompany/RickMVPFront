@@ -1,5 +1,9 @@
+const COLS = '90px 90px 2fr 64px 60px 100px 110px 1fr 70px'
+
 export default function TabelaItens({ itens }) {
   const naoMapeados = itens.filter(i => !i.mapeado).length
+  const totalCaixas = itens.reduce((acc, i) => acc + (i.quantidade || 0), 0)
+  const totalValor = itens.reduce((acc, i) => acc + (i.valorTotal || 0), 0)
 
   return (
     <div style={styles.wrapper}>
@@ -18,10 +22,14 @@ export default function TabelaItens({ itens }) {
       </div>
 
       <div style={styles.tabela}>
-        <div style={styles.headerRow}>
+        <div style={{ ...styles.headerRow, gridTemplateColumns: COLS }}>
           <span style={styles.headerCell}>Cód. cliente</span>
           <span style={styles.headerCell}>Cód. indústria</span>
+          <span style={styles.headerCell}>Descrição</span>
+          <span style={{ ...styles.headerCell, textAlign: 'center' }}>Emb. CX</span>
           <span style={{ ...styles.headerCell, textAlign: 'center' }}>Qtd.</span>
+          <span style={{ ...styles.headerCell, textAlign: 'right' }}>Vl. unitário</span>
+          <span style={{ ...styles.headerCell, textAlign: 'right' }}>Vl. total</span>
           <span style={styles.headerCell}>Observação</span>
           <span style={{ ...styles.headerCell, textAlign: 'center' }}>Status</span>
         </div>
@@ -31,6 +39,7 @@ export default function TabelaItens({ itens }) {
             key={item.id || index}
             style={{
               ...styles.row,
+              gridTemplateColumns: COLS,
               background: item.mapeado ? 'transparent' : 'var(--bg-danger)',
               borderLeft: item.mapeado ? '3px solid transparent' : '3px solid var(--text-danger)',
             }}
@@ -46,8 +55,24 @@ export default function TabelaItens({ itens }) {
               }
             </span>
 
+            <span style={{ ...styles.cell, fontSize: 13, color: 'var(--text-secondary)' }}>
+              {item.descricaoProduto || '—'}
+            </span>
+
+            <span style={{ ...styles.cell, textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: 13 }}>
+              {item.embalagemCx ?? '—'}
+            </span>
+
             <span style={{ ...styles.cell, textAlign: 'center', fontWeight: 500, fontFamily: 'var(--font-mono)' }}>
-              {item.quantidade}
+              {item.quantidade ?? '—'}
+            </span>
+
+            <span style={{ ...styles.cell, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 13 }}>
+              {item.valorUnitario != null ? formatarMoeda(item.valorUnitario) : '—'}
+            </span>
+
+            <span style={{ ...styles.cell, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 500 }}>
+              {item.valorTotal != null ? formatarMoeda(item.valorTotal) : '—'}
             </span>
 
             <span style={{ ...styles.cell, color: 'var(--text-secondary)', fontSize: 13 }}>
@@ -62,6 +87,21 @@ export default function TabelaItens({ itens }) {
             </span>
           </div>
         ))}
+
+        <div style={{ ...styles.footerRow, gridTemplateColumns: COLS }}>
+          <span style={{ ...styles.footerCell, gridColumn: '1 / 5', color: 'var(--text-secondary)', fontSize: 12 }}>
+            Totais
+          </span>
+          <span style={{ ...styles.footerCell, textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
+            {totalCaixas}
+          </span>
+          <span style={styles.footerCell} />
+          <span style={{ ...styles.footerCell, textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
+            {formatarMoeda(totalValor)}
+          </span>
+          <span style={styles.footerCell} />
+          <span style={styles.footerCell} />
+        </div>
       </div>
     </div>
   )
@@ -85,6 +125,10 @@ function Chip({ cor, children }) {
       {children}
     </span>
   )
+}
+
+function formatarMoeda(valor) {
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 const styles = {
@@ -122,14 +166,15 @@ const styles = {
   },
   tabela: {
     overflowX: 'auto',
+    minWidth: 0,
   },
   headerRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 80px 1fr 80px',
     padding: '10px 20px',
     background: 'var(--bg-surface)',
     borderBottom: '0.5px solid var(--border)',
-    gap: 12,
+    gap: 10,
+    minWidth: 860,
   },
   headerCell: {
     fontSize: 11,
@@ -140,15 +185,32 @@ const styles = {
   },
   row: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 80px 1fr 80px',
-    padding: '12px 20px',
+    padding: '11px 20px',
     borderBottom: '0.5px solid var(--border)',
-    gap: 12,
+    gap: 10,
     alignItems: 'center',
     transition: 'background 0.15s',
+    minWidth: 860,
   },
   cell: {
     fontSize: 14,
+    color: 'var(--text-primary)',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  footerRow: {
+    display: 'grid',
+    padding: '11px 20px',
+    gap: 10,
+    alignItems: 'center',
+    background: 'var(--bg-surface)',
+    borderTop: '0.5px solid var(--border-strong)',
+    minWidth: 860,
+  },
+  footerCell: {
+    fontSize: 13,
+    fontWeight: 600,
     color: 'var(--text-primary)',
     overflow: 'hidden',
     textOverflow: 'ellipsis',

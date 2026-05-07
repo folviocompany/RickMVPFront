@@ -26,6 +26,11 @@ export default function PedidoResumo({ pedido }) {
             : 'Todos mapeados'}
           subCor={pedido.itensSemMapeamento > 0 ? 'var(--text-danger)' : 'var(--text-success)'}
         />
+        <Card label="Prazo pagamento" valor={pedido.prazoPagemento ? `${pedido.prazoPagemento} dias` : '—'} />
+        <Card label="Data emissão" valor={pedido.dataEmissao || '—'} />
+        <Card label="Prev. entrega" valor={pedido.previsaoEntrega || '—'} />
+        <Card label="Limite entrega" valor={pedido.dataLimiteEntrega || '—'} />
+        <Card label="Frete" valor={pedido.condicaoFrete || '—'} />
       </div>
     </div>
   )
@@ -87,8 +92,8 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-    gap: 12,
+    gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+    gap: 10,
   },
   card: {
     background: 'var(--bg-surface)',
