@@ -28,8 +28,6 @@ export default function ProcessarPedido() {
               <button
                 onClick={exportar}
                 style={styles.btnPrimario}
-                disabled={pedido.itensSemMapeamento > 0}
-                title={pedido.itensSemMapeamento > 0 ? 'Resolva os itens sem mapeamento antes de exportar' : ''}
               >
                 Exportar Excel
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -51,7 +49,7 @@ export default function ProcessarPedido() {
                   <line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
                 <span>
-                  Há itens sem mapeamento. Cadastre os códigos desses produtos no banco de dados antes de exportar.
+                  {pedido.itensSemMapeamento} {pedido.itensSemMapeamento === 1 ? 'item sem mapeamento será exportado' : 'itens sem mapeamento serão exportados'} com linha vermelha para revisão manual.
                 </span>
               </div>
             )}
@@ -90,7 +88,7 @@ const styles = {
   },
   container: {
     width: '100%',
-    maxWidth: 720,
+    maxWidth: 1100,
   },
   barraAcoes: {
     display: 'flex',
@@ -128,11 +126,11 @@ const styles = {
     gap: 8,
     marginTop: 14,
     padding: '12px 14px',
-    background: 'var(--bg-danger)',
-    border: '0.5px solid var(--border-danger)',
+    background: '#FFFBEB',
+    border: '0.5px solid rgba(180,83,9,0.2)',
     borderRadius: 'var(--radius-md)',
     fontSize: 13,
-    color: 'var(--text-danger)',
+    color: '#92400E',
     lineHeight: 1.5,
   },
   erroContainer: {
