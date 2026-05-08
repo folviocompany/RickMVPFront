@@ -20,7 +20,13 @@ export const buscarPedido = async (id) => {
 }
 
 export const exportarExcel = (id) => {
-  window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/pedidos/${id}/exportar`, '_blank')
+  const url = `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/pedidos/${id}/exportar`
+  const a = document.createElement('a')
+  a.href = url
+  a.download = ''
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
 }
 
 export default api
