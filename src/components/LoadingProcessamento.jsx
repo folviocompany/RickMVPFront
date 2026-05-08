@@ -16,17 +16,18 @@ export default function LoadingProcessamento({ progresso }) {
             <div key={etapa} style={{ ...styles.etapa, ...(ativa ? styles.etapaAtiva : {}) }}>
               <div style={{
                 ...styles.etapaDot,
-                background: concluida ? 'var(--text-success)' : ativa ? 'var(--text-primary)' : 'var(--border-strong)',
+                background: concluida || ativa ? 'var(--accent)' : 'var(--bg-surface)',
+                border: concluida || ativa ? 'none' : '1px solid var(--border-strong)',
               }}>
                 {concluida && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3">
                     <polyline points="20,6 9,17 4,12"/>
                   </svg>
                 )}
               </div>
               <span style={{
                 fontSize: 13,
-                color: ativa ? 'var(--text-primary)' : concluida ? 'var(--text-success)' : 'var(--text-muted)',
+                color: ativa ? 'var(--text-primary)' : concluida ? 'var(--text-accent)' : 'var(--text-muted)',
                 fontWeight: ativa ? 500 : 400,
               }}>
                 {etapa}
@@ -48,8 +49,8 @@ const styles = {
   spinner: {
     width: 40,
     height: 40,
-    border: '2.5px solid var(--border)',
-    borderTopColor: 'var(--text-primary)',
+    border: '2.5px solid var(--border-strong)',
+    borderTopColor: 'var(--accent)',
     borderRadius: '50%',
     margin: '0 auto 24px',
     animation: 'spin 0.8s linear infinite',

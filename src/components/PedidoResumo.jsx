@@ -71,7 +71,7 @@ const styles = {
     flexWrap: 'wrap',
   },
   label: {
-    fontSize: 12,
+    fontSize: 11,
     color: 'var(--text-muted)',
     marginBottom: 2,
     textTransform: 'uppercase',
@@ -99,13 +99,15 @@ const styles = {
     background: 'var(--bg-surface)',
     borderRadius: 'var(--radius-md)',
     padding: '12px 14px',
+    border: '0.5px solid var(--border)',
   },
   cardLabel: {
-    fontSize: 11,
-    color: 'var(--text-muted)',
+    fontSize: 10,
+    color: 'var(--text-accent)',
     marginBottom: 4,
     textTransform: 'uppercase',
-    letterSpacing: '0.06em',
+    letterSpacing: '0.08em',
+    fontWeight: 500,
   },
   cardValor: {
     fontSize: 14,
