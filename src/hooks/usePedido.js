@@ -3,7 +3,7 @@ import { processarPdf, exportarExcel } from '../services/api'
 
 export function usePedido() {
   const [etapa, setEtapa] = useState('upload') // upload | processando | revisao | erro
-  const [pedido, setPedido] = useState(null)
+  const [pedidos, setPedidos] = useState([])
   const [erro, setErro] = useState(null)
   const [progresso, setProgresso] = useState('')
 
@@ -21,7 +21,7 @@ export function usePedido() {
       setProgresso('Convertendo códigos...')
       await delay(400)
 
-      setPedido(resultado)
+      setPedidos(Array.isArray(resultado) ? resultado : [resultado])
       setEtapa('revisao')
     } catch (err) {
       const msg = err.response?.data?.erro || 'Erro ao processar o PDF. Tente novamente.'
@@ -30,18 +30,18 @@ export function usePedido() {
     }
   }
 
-  const exportar = () => {
-    if (pedido?.id) exportarExcel(pedido.id)
+  const exportar = (id) => {
+    if (id) exportarExcel(id)
   }
 
   const reiniciar = () => {
-    setPedido(null)
+    setPedidos([])
     setErro(null)
     setProgresso('')
     setEtapa('upload')
   }
 
-  return { etapa, pedido, erro, progresso, processar, exportar, reiniciar }
+  return { etapa, pedidos, erro, progresso, processar, exportar, reiniciar }
 }
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms))
