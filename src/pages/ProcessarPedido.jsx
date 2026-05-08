@@ -5,7 +5,9 @@ import TabelaItens from '../components/TabelaItens'
 import { usePedido } from '../hooks/usePedido'
 
 export default function ProcessarPedido() {
-  const { etapa, pedidos, erro, progresso, processar, exportar, reiniciar } = usePedido()
+  const { etapa, pedidos, pedidoAtual, setPedidoAtual, erro, progresso, processar, exportar, reiniciar } = usePedido()
+
+  const pedido = pedidos[pedidoAtual]
 
   return (
     <div style={styles.pagina}>
@@ -19,51 +21,70 @@ export default function ProcessarPedido() {
           <LoadingProcessamento progresso={progresso} />
         )}
 
-        {etapa === 'revisao' && pedidos.length > 0 && (
+        {etapa === 'revisao' && pedido && (
           <div style={{ animation: 'fadeUp 0.4s ease' }}>
             <div style={styles.barraAcoes}>
               <button onClick={reiniciar} style={styles.btnSecundario}>
                 ← Novo PDF
               </button>
+
               {pedidos.length > 1 && (
-                <span style={styles.contadorPedidos}>
-                  {pedidos.length} pedidos encontrados
-                </span>
+                <div style={styles.navegacao}>
+                  <button
+                    onClick={() => setPedidoAtual(i => Math.max(0, i - 1))}
+                    disabled={pedidoAtual === 0}
+                    style={{
+                      ...styles.btnNav,
+                      opacity: pedidoAtual === 0 ? 0.35 : 1,
+                    }}
+                  >
+                    ←
+                  </button>
+                  <span style={styles.navLabel}>
+                    Pedido {pedidoAtual + 1} de {pedidos.length}
+                  </span>
+                  <button
+                    onClick={() => setPedidoAtual(i => Math.min(pedidos.length - 1, i + 1))}
+                    disabled={pedidoAtual === pedidos.length - 1}
+                    style={{
+                      ...styles.btnNav,
+                      opacity: pedidoAtual === pedidos.length - 1 ? 0.35 : 1,
+                    }}
+                  >
+                    →
+                  </button>
+                </div>
               )}
             </div>
 
-            {pedidos.map((pedido) => (
-              <div key={pedido.id} style={styles.pedidoBloco}>
-                <PedidoResumo pedido={pedido} />
-                <TabelaItens itens={pedido.itens || []} />
+            <PedidoResumo pedido={pedido} />
+            <TabelaItens itens={pedido.itens || []} />
 
-                <div style={styles.pedidoRodape}>
-                  {pedido.itensSemMapeamento > 0 && (
-                    <div style={styles.avisoMapeamento}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                      </svg>
-                      <span>
-                        {pedido.itensSemMapeamento} {pedido.itensSemMapeamento === 1 ? 'item sem mapeamento será exportado' : 'itens sem mapeamento serão exportados'} com linha vermelha para revisão manual.
-                      </span>
-                    </div>
-                  )}
-                  <button
-                    onClick={() => exportar(pedido.id)}
-                    style={styles.btnPrimario}
-                  >
-                    Exportar Excel
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="7,10 12,15 17,10"/>
-                      <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                  </button>
+            <div style={styles.pedidoRodape}>
+              {pedido.itensSemMapeamento > 0 && (
+                <div style={styles.avisoMapeamento}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  <span>
+                    {pedido.itensSemMapeamento} {pedido.itensSemMapeamento === 1 ? 'item sem mapeamento será exportado' : 'itens sem mapeamento serão exportados'} com linha vermelha para revisão manual.
+                  </span>
                 </div>
-              </div>
-            ))}
+              )}
+              <button
+                onClick={() => exportar(pedido.id)}
+                style={styles.btnPrimario}
+              >
+                Exportar Excel
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7,10 12,15 17,10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </button>
+            </div>
           </div>
         )}
 
@@ -130,14 +151,30 @@ const styles = {
     gap: 6,
     fontFamily: 'var(--font-main)',
     opacity: 1,
+    flexShrink: 0,
   },
-  contadorPedidos: {
+  navegacao: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+  },
+  btnNav: {
+    fontSize: 15,
+    padding: '5px 12px',
+    background: 'var(--bg-card)',
+    border: '0.5px solid var(--border-strong)',
+    borderRadius: 'var(--radius-md)',
+    color: 'var(--text-primary)',
+    fontFamily: 'var(--font-main)',
+    cursor: 'pointer',
+    transition: 'opacity 0.15s',
+  },
+  navLabel: {
     fontSize: 13,
-    color: 'var(--text-muted)',
-    fontWeight: 400,
-  },
-  pedidoBloco: {
-    marginBottom: 32,
+    color: 'var(--text-secondary)',
+    fontVariantNumeric: 'tabular-nums',
+    minWidth: 110,
+    textAlign: 'center',
   },
   pedidoRodape: {
     display: 'flex',
