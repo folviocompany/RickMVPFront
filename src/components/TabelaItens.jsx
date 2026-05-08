@@ -40,8 +40,12 @@ export default function TabelaItens({ itens }) {
             style={{
               ...styles.row,
               gridTemplateColumns: COLS,
-              background: item.mapeado ? 'transparent' : 'var(--bg-danger)',
-              borderLeft: item.mapeado ? '3px solid transparent' : '3px solid var(--text-danger)',
+              background: item.mapeado
+                ? (index % 2 === 0 ? '#111111' : '#0f0f0f')
+                : 'var(--bg-danger)',
+              borderLeft: item.mapeado
+                ? '2px solid var(--accent)'
+                : '2px solid var(--text-danger)',
             }}
           >
             <span style={{ ...styles.cell, fontFamily: 'var(--font-mono)', fontSize: 13 }}>
@@ -89,14 +93,14 @@ export default function TabelaItens({ itens }) {
         ))}
 
         <div style={{ ...styles.footerRow, gridTemplateColumns: COLS }}>
-          <span style={{ ...styles.footerCell, gridColumn: '1 / 5', color: 'var(--text-secondary)', fontSize: 12 }}>
+          <span style={{ ...styles.footerCell, gridColumn: '1 / 5', color: 'var(--text-accent)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Totais
           </span>
           <span style={{ ...styles.footerCell, textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
             {totalCaixas}
           </span>
           <span style={styles.footerCell} />
-          <span style={{ ...styles.footerCell, textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
+          <span style={{ ...styles.footerCell, textAlign: 'right', fontFamily: 'var(--font-mono)', color: 'var(--text-accent)' }}>
             {formatarMoeda(totalValor)}
           </span>
           <span style={styles.footerCell} />
