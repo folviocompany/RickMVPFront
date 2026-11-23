@@ -46,10 +46,30 @@ export default function AppShell({ pedidoState }) {
 
   useEffect(() => {
     const controller = new AbortController()
-    verificarSaude(controller.signal)
-      .then(() => setServiceStatus('online'))
-      .catch(() => setServiceStatus('offline'))
-    return () => controller.abort()
+    let retryTimer
+    let healthTimer
+    let failures = 0
+
+    const checkHealth = async () => {
+      try {
+        await verificarSaude(controller.signal)
+        failures = 0
+        setServiceStatus('online')
+        healthTimer = window.setTimeout(checkHealth, 60000)
+      } catch {
+        if (controller.signal.aborted) return
+        failures += 1
+        setServiceStatus(failures >= 3 ? 'offline' : 'checking')
+        retryTimer = window.setTimeout(checkHealth, 10000)
+      }
+    }
+
+    checkHealth()
+    return () => {
+      controller.abort()
+      window.clearTimeout(retryTimer)
+      window.clearTimeout(healthTimer)
+    }
   }, [])
 
   return (
@@ -127,7 +147,7 @@ function NavItem({ to, label, icon: Icon }) {
 
 function ServiceStatus({ status, compact = false }) {
   const labels = {
-    checking: 'Verificando serviço',
+    checking: 'Iniciando serviço',
     online: 'Serviço operacional',
     offline: 'Serviço indisponível',
   }

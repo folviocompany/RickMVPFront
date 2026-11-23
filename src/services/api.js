@@ -30,8 +30,8 @@ export function getErrorMessage(error) {
     || 'Não foi possível concluir a operação.'
 }
 
-export async function verificarSaude(signal) {
-  const { data } = await api.get('/health', { signal, timeout: 8000 })
+export async function verificarSaude(signal, timeout = 60000) {
+  const { data } = await api.get('/health', { signal, timeout })
   return data
 }
 
