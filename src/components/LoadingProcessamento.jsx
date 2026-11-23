@@ -1,90 +1,48 @@
-export default function LoadingProcessamento({ progresso }) {
-  const etapas = ['Lendo o PDF...', 'Enviando para a IA...', 'Convertendo códigos...']
-  const atual = etapas.indexOf(progresso)
+import { Check, FileText, LoaderCircle, X } from 'lucide-react'
+
+const steps = [
+  { key: 'recebido', label: 'Documento recebido', min: 0 },
+  { key: 'ocr', label: 'Leitura e OCR', min: 10 },
+  { key: 'ia', label: 'Interpretação com IA', min: 30 },
+  { key: 'mapa', label: 'Identificação de produtos', min: 70 },
+  { key: 'fim', label: 'Validação dos dados', min: 95 },
+]
+
+export default function LoadingProcessamento({ processamento, arquivo, onCancel }) {
+  const progress = Number(processamento?.progresso || 0)
+  const message = processamento?.mensagem || 'Preparando processamento'
 
   return (
-    <div style={styles.container}>
-      <div style={styles.spinner} />
+    <section className="processing-card" aria-live="polite">
+      <div className="processing-heading">
+        <div className="processing-file-icon"><FileText size={24} /></div>
+        <div>
+          <span className="eyebrow">Processamento em andamento</span>
+          <h2>{arquivo?.name || 'Pedido em PDF'}</h2>
+          <p>{message}</p>
+        </div>
+        <LoaderCircle className="spinner-icon" size={26} aria-hidden="true" />
+      </div>
 
-      <h2 style={styles.titulo}>Processando pedido</h2>
+      <div className="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progress} aria-label="Progresso do processamento">
+        <span style={{ width: `${Math.min(100, progress)}%` }} />
+      </div>
+      <div className="progress-meta"><span>Status informado pelo backend</span><strong>{progress}%</strong></div>
 
-      <div style={styles.etapas}>
-        {etapas.map((etapa, i) => {
-          const concluida = i < atual
-          const ativa = i === atual
+      <ol className="step-list">
+        {steps.map((step, index) => {
+          const completed = progress > (steps[index + 1]?.min ?? 100)
+          const active = progress >= step.min && !completed
           return (
-            <div key={etapa} style={{ ...styles.etapa, ...(ativa ? styles.etapaAtiva : {}) }}>
-              <div style={{
-                ...styles.etapaDot,
-                background: concluida || ativa ? 'var(--accent)' : 'var(--bg-surface)',
-                border: concluida || ativa ? 'none' : '1px solid var(--border-strong)',
-              }}>
-                {concluida && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3">
-                    <polyline points="20,6 9,17 4,12"/>
-                  </svg>
-                )}
-              </div>
-              <span style={{
-                fontSize: 13,
-                color: ativa ? 'var(--text-primary)' : concluida ? 'var(--text-accent)' : 'var(--text-muted)',
-                fontWeight: ativa ? 500 : 400,
-              }}>
-                {etapa}
-              </span>
-            </div>
+            <li key={step.key} className={`${completed ? 'is-complete' : ''} ${active ? 'is-active' : ''}`}>
+              <span className="step-marker">{completed ? <Check size={14} /> : index + 1}</span>
+              <span>{step.label}</span>
+            </li>
           )
         })}
-      </div>
-    </div>
-  )
-}
+      </ol>
 
-const styles = {
-  container: {
-    textAlign: 'center',
-    padding: '3rem 2rem',
-    animation: 'fadeUp 0.3s ease',
-  },
-  spinner: {
-    width: 40,
-    height: 40,
-    border: '2.5px solid var(--border-strong)',
-    borderTopColor: 'var(--accent)',
-    borderRadius: '50%',
-    margin: '0 auto 24px',
-    animation: 'spin 0.8s linear infinite',
-  },
-  titulo: {
-    fontSize: 18,
-    fontWeight: 500,
-    color: 'var(--text-primary)',
-    marginBottom: 28,
-  },
-  etapas: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 12,
-    maxWidth: 260,
-    margin: '0 auto',
-    textAlign: 'left',
-  },
-  etapa: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-  },
-  etapaAtiva: {
-    animation: 'pulse 1.5s ease infinite',
-  },
-  etapaDot: {
-    width: 20,
-    height: 20,
-    borderRadius: '50%',
-    flexShrink: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'background 0.3s ease',
-  },
+      <button className="button button-ghost" type="button" onClick={onCancel}><X size={16} /> Cancelar</button>
+    </section>
+  )
 }

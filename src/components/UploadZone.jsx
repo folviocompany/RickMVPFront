@@ -1,169 +1,86 @@
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
+import { CheckCircle2, FileText, UploadCloud, X } from 'lucide-react'
+import { validatePdf } from '../utils/fileValidation'
 
 export default function UploadZone({ onArquivo }) {
-  const [arrastando, setArrastando] = useState(false)
-  const inputRef = useRef()
+  const [dragging, setDragging] = useState(false)
+  const [file, setFile] = useState(null)
+  const [error, setError] = useState(null)
+  const inputRef = useRef(null)
 
-  const handleDrop = (e) => {
-    e.preventDefault()
-    setArrastando(false)
-    const arquivo = e.dataTransfer.files[0]
-    if (arquivo?.type === 'application/pdf') onArquivo(arquivo)
+  const selectFile = (candidate) => {
+    const validation = validatePdf(candidate)
+    setError(validation)
+    setFile(validation ? null : candidate)
   }
 
-  const handleChange = (e) => {
-    const arquivo = e.target.files[0]
-    if (arquivo) onArquivo(arquivo)
+  const onDrop = (event) => {
+    event.preventDefault()
+    setDragging(false)
+    selectFile(event.dataTransfer.files[0])
+  }
+
+  const onKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      inputRef.current?.click()
+    }
   }
 
   return (
-    <div style={{ animation: 'fadeUp 0.4s ease' }}>
-      <div style={styles.header}>
-        <div style={styles.logo}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14,2 14,8 20,8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
-        </div>
-        <div>
-          <h1 style={styles.titulo}>ADI</h1>
-          <p style={styles.subtitulo}>Automação de Digitação de Pedidos</p>
-        </div>
-      </div>
-
+    <section className="upload-card">
       <div
-        style={{
-          ...styles.dropzone,
-          ...(arrastando ? styles.arrastando : {}),
-        }}
-        onDragOver={(e) => { e.preventDefault(); setArrastando(true) }}
-        onDragLeave={() => setArrastando(false)}
-        onDrop={handleDrop}
-        onClick={() => inputRef.current.click()}
+        className={`dropzone ${dragging ? 'is-dragging' : ''} ${error ? 'has-error' : ''}`}
+        role="button"
+        tabIndex={0}
+        aria-label="Selecionar arquivo PDF"
+        onClick={() => inputRef.current?.click()}
+        onKeyDown={onKeyDown}
+        onDragOver={(event) => { event.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={onDrop}
       >
         <input
           ref={inputRef}
           type="file"
-          accept="application/pdf"
-          style={{ display: 'none' }}
-          onChange={handleChange}
+          accept="application/pdf,.pdf"
+          onChange={(event) => selectFile(event.target.files[0])}
+          hidden
         />
+        <div className="upload-icon"><UploadCloud size={29} /></div>
+        <h3>{dragging ? 'Solte o documento aqui' : 'Arraste o PDF do pedido'}</h3>
+        <p>ou clique para procurar no computador</p>
+        <span className="file-rule">PDF · máximo de 20 MB · um arquivo por vez</span>
+      </div>
 
-        <div style={styles.iconeUpload}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17,8 12,3 7,8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
+      {error && <p className="field-error" role="alert">{error}</p>}
+
+      {file && (
+        <div className="selected-file" aria-live="polite">
+          <div className="selected-file-icon"><FileText size={22} /></div>
+          <div>
+            <strong>{file.name}</strong>
+            <span>{formatBytes(file.size)} · pronto para processar</span>
+          </div>
+          <CheckCircle2 className="selected-check" size={20} />
+          <button type="button" className="icon-button" aria-label="Remover arquivo" onClick={(event) => { event.stopPropagation(); setFile(null) }}><X size={18} /></button>
         </div>
+      )}
 
-        <p style={styles.dropTexto}>
-          {arrastando ? 'Solte o PDF aqui' : 'Arraste o PDF do pedido'}
-        </p>
-        <p style={styles.dropSub}>ou clique para selecionar</p>
-
-        <span style={styles.badge}>PDF até 20MB</span>
+      <div className="upload-footer">
+        <div className="privacy-note">
+          <strong>Processamento seguro</strong>
+          <span>O documento é enviado ao backend configurado e processado pela integração de IA.</span>
+        </div>
+        <button className="button button-primary button-large" type="button" disabled={!file} onClick={() => onArquivo(file)}>
+          Processar pedido
+        </button>
       </div>
-
-      <div style={styles.dica}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span>O sistema identifica o CNPJ automaticamente e converte os códigos do cliente para os da indústria.</span>
-      </div>
-    </div>
+    </section>
   )
 }
 
-const styles = {
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 14,
-    marginBottom: 32,
-  },
-  logo: {
-    width: 42,
-    height: 42,
-    borderRadius: 'var(--radius-md)',
-    background: '#000',
-    border: '1px solid var(--border-accent)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 600,
-    color: 'var(--text-primary)',
-    letterSpacing: '-0.5px',
-  },
-  subtitulo: {
-    fontSize: 13,
-    color: 'var(--text-secondary)',
-  },
-  dropzone: {
-    border: '1.5px dashed rgba(0,255,135,0.3)',
-    borderRadius: 'var(--radius-xl)',
-    padding: '4rem 2rem',
-    textAlign: 'center',
-    cursor: 'pointer',
-    background: 'var(--bg-card)',
-    transition: 'all 0.2s ease',
-    boxShadow: 'var(--shadow-card)',
-  },
-  arrastando: {
-    borderColor: 'var(--accent)',
-    background: 'var(--accent-glow)',
-    boxShadow: 'var(--shadow-accent)',
-    transform: 'scale(1.01)',
-  },
-  iconeUpload: {
-    width: 56,
-    height: 56,
-    borderRadius: '50%',
-    background: 'var(--bg-surface)',
-    border: '1px solid var(--border-accent)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto 16px',
-  },
-  dropTexto: {
-    fontSize: 16,
-    fontWeight: 500,
-    color: 'var(--text-primary)',
-    marginBottom: 4,
-  },
-  dropSub: {
-    fontSize: 13,
-    color: 'var(--text-secondary)',
-    marginBottom: 20,
-  },
-  badge: {
-    fontSize: 12,
-    color: 'var(--accent)',
-    background: 'transparent',
-    border: '1px solid var(--border-accent)',
-    borderRadius: 'var(--radius-sm)',
-    padding: '4px 12px',
-    fontFamily: 'var(--font-mono)',
-  },
-  dica: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: 8,
-    marginTop: 20,
-    padding: '12px 14px',
-    background: 'var(--bg-surface)',
-    borderRadius: 'var(--radius-md)',
-    fontSize: 13,
-    color: 'var(--text-muted)',
-    lineHeight: 1.5,
-    border: '0.5px solid var(--border)',
-  },
+function formatBytes(bytes) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
