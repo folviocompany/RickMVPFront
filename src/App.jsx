@@ -26,16 +26,7 @@ export default function App() {
             />
           )}
         />
-        <Route
-          path="historico"
-          element={(
-            <PlaceholderPage
-              title="Histórico e rastreabilidade"
-              description="Acompanhe processamentos, etapas, erros e alterações realizadas."
-              dependency="É necessário um endpoint paginado de histórico e auditoria no backend."
-            />
-          )}
-        />
+        <Route path="historico" element={<PedidosSessao mode="historico" />} />
         <Route
           path="configuracoes"
           element={(

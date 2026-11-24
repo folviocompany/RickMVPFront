@@ -1,48 +1,98 @@
-# ADI Frontend
+# Automação e conferência de Pedidos
 
-Interface React + Vite do ADI (Automação de Digitação de Pedidos), integrada ao backend Python/FastAPI.
+Este repositório contém a interface do sistema de automação e conferência de pedidos. O frontend foi desenvolvido em React e oferece uma experiência simples para enviar documentos, acompanhar o processamento, revisar os dados extraídos e gerar a planilha final.
 
-## Funcionalidades disponíveis
+## Tecnologias utilizadas
 
-- Dashboard com métricas reais da sessão atual.
-- Status do serviço por meio de `GET /health`.
-- Upload individual de PDF com validação de tipo e limite de 20 MB.
-- Acompanhamento assíncrono do processamento.
-- Conferência lado a lado do PDF original e dos dados extraídos.
-- Listagem de itens e indicação de produtos sem mapeamento.
-- Exportação do pedido em Excel.
+1. React
+2. Vite
+3. React Router
+4. Axios
+5. Lucide React
+6. Vitest e Testing Library
 
-Telas de histórico, catálogo, edição e configurações exibem explicitamente as dependências de backend ainda ausentes; não são preenchidas com dados fictícios.
+## Preparação do ambiente
 
-## Rodar localmente
+Abra um terminal nesta pasta e instale as dependências.
 
-```bash
+```powershell
 npm install
-copy .env.example .env
-npm run dev
 ```
 
-A aplicação fica disponível em `http://localhost:5173`.
+Se desejar informar o endereço do backend manualmente, crie o arquivo `.env` a partir do exemplo.
 
-## Variável de ambiente
+```powershell
+Copy-Item .env.example .env
+```
+
+Para o funcionamento local, utilize a configuração abaixo.
 
 ```env
 VITE_API_URL=http://localhost:8080
 ```
 
-## Qualidade
+Quando essa variável não é informada, a aplicação também utiliza `http://localhost:8080` como endereço padrão.
 
-```bash
-npm run lint
+## Execução local
+
+Inicie o frontend com o comando abaixo.
+
+```powershell
+npm run dev
+```
+
+A aplicação fica disponível em `http://localhost:5173`.
+
+O backend deve estar em execução na porta `8080` para que o processamento e o histórico funcionem.
+
+## Funcionalidades disponíveis
+
+1. Painel com quantidade de pedidos, itens, revisões e valores financeiros
+2. Envio individual de arquivos PDF
+3. Acompanhamento do progresso do processamento
+4. Visualização do documento ao lado dos dados extraídos
+5. Separação dos pedidos pelo arquivo que originou o processamento
+6. Navegação apenas entre pedidos pertencentes ao mesmo PDF
+7. Histórico persistente
+8. Edição dos dados gerais e dos itens
+9. Recálculo automático dos valores durante a edição
+10. Aprovação dos pedidos conferidos
+11. Exportação em Excel
+12. Layout adaptado para computadores, notebooks, tablets e celulares
+
+## Fluxo de utilização
+
+1. Acesse a opção `Novo pedido`.
+2. Escolha um arquivo PDF.
+3. Aguarde a leitura e a extração dos dados.
+4. Compare as informações apresentadas com o documento original.
+5. Use a opção `Editar dados` quando alguma informação precisar de correção.
+6. Salve as alterações antes de aprovar ou exportar.
+7. Aprove o pedido depois da conferência.
+8. Exporte a planilha Excel.
+
+O histórico organiza os registros pelo nome do arquivo. Quando um PDF possui mais de um pedido, as setas de navegação percorrem apenas os pedidos encontrados naquele documento.
+
+## Cálculos financeiros
+
+O valor total de cada item utiliza o campo extraído do documento. Quando esse campo não está disponível, a aplicação calcula a quantidade multiplicada pelo valor unitário.
+
+O sistema apresenta o total de cada pedido, o subtotal de cada documento e a soma de todos os pedidos carregados do histórico.
+
+## Testes e qualidade
+
+Use os comandos abaixo para validar o projeto.
+
+```powershell
 npm test
+npm run lint
 npm run build
 ```
 
-## Contratos usados
+Os testes verificam os componentes principais, os cálculos financeiros, a edição e o agrupamento dos pedidos por documento.
 
-- `GET /health`
-- `POST /api/processamentos`
-- `GET /api/processamentos/{id}`
-- `GET /api/processamentos/{id}/pedidos`
-- `GET /api/pedidos/{id}`
-- `GET /api/pedidos/{id}/exportar`
+## Demonstração local
+
+Para uma apresentação, mantenha dois terminais abertos. Em um deles execute o backend com `python run.py`. No outro execute o frontend com `npm run dev`.
+
+Antes de iniciar a demonstração, confirme que o indicador de serviço disponível aparece no topo da aplicação. Em seguida, processe um PDF, revise os dados, mostre o cálculo dos valores e exporte a planilha.

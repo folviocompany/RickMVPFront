@@ -1,9 +1,10 @@
 import StatusBadge from './StatusBadge'
+import { calcularTotalItem, formatarMoeda } from '../utils/money'
 
 export default function TabelaItens({ itens }) {
   const pending = itens.filter((item) => !item.mapeado).length
   const quantity = itens.reduce((total, item) => total + Number(item.quantidade || 0), 0)
-  const totalValue = itens.reduce((total, item) => total + Number(item.valorTotal || 0), 0)
+  const totalValue = itens.reduce((total, item) => total + calcularTotalItem(item), 0)
 
   return (
     <section className="items-card">
@@ -31,22 +32,17 @@ export default function TabelaItens({ itens }) {
                 </td>
                 <td className="mono">{item.codigoIndustria || '—'}</td>
                 <td className="numeric strong">{item.quantidade ?? '—'}</td>
-                <td className="numeric">{formatCurrency(item.valorUnitario)}</td>
-                <td className="numeric strong">{formatCurrency(item.valorTotal)}</td>
+                <td className="numeric">{item.valorUnitario == null ? '—' : formatarMoeda(item.valorUnitario)}</td>
+                <td className="numeric strong">{formatarMoeda(calcularTotalItem(item))}</td>
                 <td><StatusBadge mapped={item.mapeado} /></td>
               </tr>
             ))}
           </tbody>
           <tfoot>
-            <tr><td colSpan="3">Totais</td><td className="numeric">{quantity}</td><td /><td className="numeric">{formatCurrency(totalValue)}</td><td /></tr>
+            <tr><td colSpan="3">Totais</td><td className="numeric">{quantity}</td><td /><td className="numeric">{formatarMoeda(totalValue)}</td><td /></tr>
           </tfoot>
         </table>
       </div>
     </section>
   )
-}
-
-function formatCurrency(value) {
-  if (value === null || value === undefined) return '—'
-  return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }

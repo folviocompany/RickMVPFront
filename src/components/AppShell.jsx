@@ -27,7 +27,7 @@ const navigation = [
 const pageMeta = {
   '/': ['Dashboard', 'Visão geral da operação'],
   '/novo-pedido': ['Novo pedido', 'Processamento e conferência'],
-  '/pedidos': ['Pedidos', 'Pedidos processados nesta sessão'],
+  '/pedidos': ['Pedidos', 'Pedidos processados e persistidos'],
   '/revisoes': ['Revisões pendentes', 'Itens que exigem conferência'],
   '/produtos': ['Produtos e correspondências', 'Catálogo e mapeamentos'],
   '/historico': ['Histórico', 'Rastreabilidade dos processamentos'],

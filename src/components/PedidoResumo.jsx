@@ -1,4 +1,5 @@
 import StatusBadge from './StatusBadge'
+import { calcularTotalPedido, formatarMoeda } from '../utils/money'
 
 export default function PedidoResumo({ pedido }) {
   return (
@@ -14,6 +15,7 @@ export default function PedidoResumo({ pedido }) {
         <SummaryItem label="Cliente" value={pedido.nomeCliente || 'Não identificado'} helper={formatCnpj(pedido.cnpjCliente)} pending={!pedido.nomeCliente} />
         <SummaryItem label="Arquivo" value={pedido.arquivoNome} />
         <SummaryItem label="Itens" value={`${pedido.totalItens} itens`} helper={`${pedido.itensSemMapeamento} sem mapeamento`} pending={pedido.itensSemMapeamento > 0} />
+        <SummaryItem label="Valor total" value={formatarMoeda(calcularTotalPedido(pedido))} />
         <SummaryItem label="Prazo de pagamento" value={pedido.prazoPagamento ? `${pedido.prazoPagamento} dias` : 'Não informado'} pending={!pedido.prazoPagamento} />
         <SummaryItem label="Data de emissão" value={pedido.dataEmissao || 'Não informada'} pending={!pedido.dataEmissao} />
         <SummaryItem label="Previsão de entrega" value={pedido.previsaoEntrega || 'Não informada'} pending={!pedido.previsaoEntrega} />

@@ -1,7 +1,9 @@
-import { ArrowLeft, ArrowRight, Download, RotateCcw } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowLeft, ArrowRight, Check, Download, Pencil, RotateCcw } from 'lucide-react'
 import { useOutletContext } from 'react-router-dom'
 import DocumentPreview from '../components/DocumentPreview'
 import LoadingProcessamento from '../components/LoadingProcessamento'
+import PedidoEditor from '../components/PedidoEditor'
 import PedidoResumo from '../components/PedidoResumo'
 import TabelaItens from '../components/TabelaItens'
 import UploadZone from '../components/UploadZone'
@@ -9,7 +11,7 @@ import UploadZone from '../components/UploadZone'
 export default function ProcessarPedido() {
   const {
     etapa,
-    pedidos,
+    pedidosAtivos,
     pedidoAtual,
     setPedidoAtual,
     erro,
@@ -20,8 +22,12 @@ export default function ProcessarPedido() {
     exportar,
     reiniciar,
     cancelar,
+    salvarPedido,
+    aprovar,
   } = useOutletContext()
-  const pedido = pedidos[pedidoAtual]
+  const pedido = pedidosAtivos[pedidoAtual]
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   if (etapa === 'upload') {
     return (
@@ -56,6 +62,18 @@ export default function ProcessarPedido() {
 
   if (!pedido) return null
 
+  const handleSave = async (payload) => {
+    setSaving(true)
+    try {
+      await salvarPedido(pedido.id, payload)
+      setEditing(false)
+    } catch {
+      // O hook exibe a mensagem detalhada sem fechar o formulário.
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="review-page">
       <section className="review-toolbar">
@@ -65,29 +83,35 @@ export default function ProcessarPedido() {
           <p>Compare o documento original com os dados interpretados.</p>
         </div>
         <div className="review-actions">
-          {pedidos.length > 1 && (
+          {pedidosAtivos.length > 1 && (
             <div className="pager" aria-label="Navegação entre pedidos">
-              <button type="button" className="icon-button" disabled={pedidoAtual === 0} onClick={() => setPedidoAtual((index) => index - 1)} aria-label="Pedido anterior"><ArrowLeft size={18} /></button>
-              <span>{pedidoAtual + 1} de {pedidos.length}</span>
-              <button type="button" className="icon-button" disabled={pedidoAtual === pedidos.length - 1} onClick={() => setPedidoAtual((index) => index + 1)} aria-label="Próximo pedido"><ArrowRight size={18} /></button>
+              <button type="button" className="icon-button" disabled={editing || pedidoAtual === 0} onClick={() => setPedidoAtual((index) => index - 1)} aria-label="Pedido anterior"><ArrowLeft size={18} /></button>
+              <span>{pedidoAtual + 1} de {pedidosAtivos.length} neste PDF</span>
+              <button type="button" className="icon-button" disabled={editing || pedidoAtual === pedidosAtivos.length - 1} onClick={() => setPedidoAtual((index) => index + 1)} aria-label="Próximo pedido"><ArrowRight size={18} /></button>
             </div>
           )}
           <button className="button button-secondary" type="button" onClick={reiniciar}><RotateCcw size={17} /> Novo PDF</button>
-          <button className="button button-primary" type="button" onClick={() => exportar(pedido.id)}><Download size={17} /> Exportar Excel</button>
+          <button className="button button-secondary" type="button" onClick={() => setEditing((value) => !value)}><Pencil size={17} /> {editing ? 'Cancelar edição' : 'Editar dados'}</button>
+          <button className="button button-secondary" type="button" disabled={editing || pedido.status === 'APROVADO'} onClick={() => aprovar(pedido.id)}><Check size={17} /> {pedido.status === 'APROVADO' ? 'Aprovado' : 'Aprovar'}</button>
+          <button className="button button-primary" type="button" disabled={editing} onClick={() => exportar(pedido.id)}><Download size={17} /> Exportar Excel</button>
         </div>
       </section>
 
       <div className="read-only-banner">
-        <strong>Modo de conferência</strong>
-        <span>A edição e confirmação ainda dependem de endpoints de atualização no backend. Os dados abaixo são somente leitura.</span>
+        <strong>{editing ? 'Modo de edição' : 'Modo de conferência'}</strong>
+        <span>{editing ? 'Revise os campos e salve antes de aprovar ou exportar.' : 'Compare o documento com os dados interpretados e edite qualquer divergência.'}</span>
       </div>
 
       <div className="review-split">
         <DocumentPreview url={arquivoUrl} filename={arquivo?.name || pedido.arquivoNome} />
-        <div className="review-data">
-          <PedidoResumo pedido={pedido} />
-          <TabelaItens itens={pedido.itens || []} />
-        </div>
+        {editing ? (
+          <PedidoEditor key={pedido.id} pedido={pedido} saving={saving} onSave={handleSave} onCancel={() => setEditing(false)} />
+        ) : (
+          <div className="review-data">
+            <PedidoResumo pedido={pedido} />
+            <TabelaItens itens={pedido.itens || []} />
+          </div>
+        )}
       </div>
     </div>
   )

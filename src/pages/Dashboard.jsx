@@ -1,6 +1,7 @@
-import { AlertTriangle, CheckCircle2, FileSpreadsheet, PackageCheck } from 'lucide-react'
+import { AlertTriangle, BadgeDollarSign, CheckCircle2, FileSpreadsheet, PackageCheck } from 'lucide-react'
 import { Link, useOutletContext } from 'react-router-dom'
 import StatusBadge from '../components/StatusBadge'
+import { calcularTotalPedido, calcularTotalPedidos, formatarMoeda } from '../utils/money'
 
 export default function Dashboard() {
   const { pedidos, serviceStatus } = useOutletContext()
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const revisoes = pedidos.filter((pedido) => pedido.status === 'REVISAO').length
   const exportados = pedidos.filter((pedido) => pedido.status === 'EXPORTADO').length
   const taxa = totalItens ? Math.round((itensMapeados / totalItens) * 100) : 0
+  const valorTotal = calcularTotalPedidos(pedidos)
 
   return (
     <div className="page-stack">
@@ -26,11 +28,12 @@ export default function Dashboard() {
 
       <div className="session-notice">
         <AlertTriangle size={18} />
-        <span>Os indicadores abaixo representam somente esta sessão. O backend ainda não possui um endpoint de histórico consolidado.</span>
+        <span>Os indicadores abaixo representam os pedidos carregados do histórico persistente.</span>
       </div>
 
       <section className="metric-grid" aria-label="Indicadores da sessão">
-        <MetricCard icon={FileSpreadsheet} label="Pedidos processados" value={pedidos.length} hint="Nesta sessão" />
+        <MetricCard icon={FileSpreadsheet} label="Pedidos processados" value={pedidos.length} hint="Histórico carregado" />
+        <MetricCard icon={BadgeDollarSign} label="Valor total" value={formatarMoeda(valorTotal)} hint="Soma de todos os pedidos" tone="success" />
         <MetricCard icon={CheckCircle2} label="Pedidos exportados" value={exportados} hint="Planilhas geradas" tone="success" />
         <MetricCard icon={PackageCheck} label="Itens identificados" value={`${taxa}%`} hint={`${itensMapeados} de ${totalItens}`} tone="blue" />
         <MetricCard icon={AlertTriangle} label="Aguardando revisão" value={revisoes} hint="Pedidos com pendências" tone="warning" />
@@ -40,7 +43,7 @@ export default function Dashboard() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">Atividade recente</span>
-            <h2>Pedidos desta sessão</h2>
+            <h2>Pedidos mais recentes</h2>
           </div>
           {pedidos.length > 0 && <Link className="text-link" to="/pedidos">Ver todos</Link>}
         </div>
@@ -48,21 +51,22 @@ export default function Dashboard() {
         {pedidos.length === 0 ? (
           <div className="empty-state compact">
             <FileSpreadsheet size={28} />
-            <h3>Nenhum pedido processado nesta sessão</h3>
+            <h3>Nenhum pedido processado</h3>
             <p>O primeiro pedido aparecerá aqui assim que o processamento for concluído.</p>
           </div>
         ) : (
           <div className="table-scroll">
             <table className="data-table">
               <thead>
-                <tr><th>Pedido</th><th>Cliente</th><th>Itens</th><th>Status</th></tr>
+                <tr><th>Pedido</th><th>Cliente</th><th>Itens</th><th>Valor</th><th>Status</th></tr>
               </thead>
               <tbody>
-                {pedidos.slice(-5).reverse().map((pedido) => (
+                {pedidos.slice(0, 5).map((pedido) => (
                   <tr key={pedido.id}>
                     <td className="mono strong">#{pedido.numeroPdf || 'S/N'}</td>
                     <td>{pedido.nomeCliente || 'Cliente não identificado'}</td>
                     <td>{pedido.totalItens}</td>
+                    <td className="numeric strong">{formatarMoeda(calcularTotalPedido(pedido))}</td>
                     <td><StatusBadge status={pedido.status} /></td>
                   </tr>
                 ))}

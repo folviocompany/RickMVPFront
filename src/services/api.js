@@ -40,6 +40,39 @@ export async function buscarPedido(id, signal) {
   return data
 }
 
+export async function listarPedidos(signal) {
+  const pedidos = []
+  const ids = new Set()
+  const limit = 200
+  let offset = 0
+  let page
+  do {
+    const response = await api.get('/api/pedidos', {
+      params: { limit, offset },
+      signal,
+    })
+    page = response.data
+    offset += page.length
+    page.forEach((pedido) => {
+      if (!ids.has(pedido.id)) {
+        ids.add(pedido.id)
+        pedidos.push(pedido)
+      }
+    })
+  } while (page.length === limit)
+  return pedidos
+}
+
+export async function atualizarPedido(id, payload) {
+  const { data } = await api.patch(`/api/pedidos/${id}`, payload)
+  return data
+}
+
+export async function aprovarPedido(id) {
+  const { data } = await api.post(`/api/pedidos/${id}/aprovar`)
+  return data
+}
+
 export async function processarPdf(arquivo, onProgresso, signal) {
   const formData = new FormData()
   formData.append('arquivo', arquivo)
