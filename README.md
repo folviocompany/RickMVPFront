@@ -1,4 +1,12 @@
-# Automação e conferência de Pedidos
+# Extracta
+
+Falhas e interrupções podem ser reprocessadas pelo botão `Reprocessar este documento`, preservando o mesmo registro. Quando a recuperação NVIDIA estiver explicitamente habilitada no backend, sugestões aparecem com a página e o texto de origem. A opção `Usar sugestão na edição` preenche apenas o rascunho; salvar e aprovar continuam sendo ações separadas.
+
+A opção `Processar lote`, em `http://localhost:5173/extracta`, permite selecionar vários PDFs e acompanhar o resultado individual de cada documento. Os dados mostram a página de origem, código e embalagem originais, pendências e os totais dos produtos e do pedido separadamente.
+
+O novo agente trabalha com OCR local e exige o Tesseract instalado no backend. Seus lotes ficam no PostgreSQL e podem ser reabertos na opção `Histórico`. A conferência permite corrigir os dados, registrar responsável e justificativa, aprovar e exportar um documento ou todo o lote.
+
+Editar um documento aprovado exige nova aprovação. As evidências e os valores extraídos continuam preservados. O Excel tem abas de pedidos, itens, pendências, auditoria e evidências. Seu formato é provisório e ainda não foi validado para importação no Salesforce.
 
 Este repositório contém a interface do sistema de automação e conferência de pedidos. O frontend foi desenvolvido em React e oferece uma experiência simples para enviar documentos, acompanhar o processamento, revisar os dados extraídos e gerar a planilha final.
 

@@ -16,6 +16,7 @@ import Toast from './Toast'
 
 const navigation = [
   { to: '/', label: 'Dashboard', icon: Gauge },
+  { to: '/extracta', label: 'Processar lote', icon: Files },
   { to: '/novo-pedido', label: 'Novo pedido', icon: FilePlus2 },
   { to: '/pedidos', label: 'Pedidos', icon: Files },
   { to: '/revisoes', label: 'Revisões pendentes', icon: ClipboardCheck },
@@ -26,6 +27,7 @@ const navigation = [
 
 const pageMeta = {
   '/': ['Dashboard', 'Visão geral da operação'],
+  '/extracta': ['Processar lote', 'Extração e conferência documental'],
   '/novo-pedido': ['Novo pedido', 'Processamento e conferência'],
   '/pedidos': ['Pedidos', 'Pedidos processados e persistidos'],
   '/revisoes': ['Revisões pendentes', 'Itens que exigem conferência'],
@@ -83,10 +85,10 @@ export default function AppShell({ pedidoState }) {
 
       <aside className={`sidebar ${menuOpen ? 'is-open' : ''}`}>
         <div className="brand">
-          <span className="brand-mark" aria-hidden="true">ADI</span>
+          <span className="brand-mark" aria-hidden="true">EX</span>
           <div>
-            <strong>ADI</strong>
-            <span>Automação de pedidos</span>
+            <strong>Extracta</strong>
+            <span>Intelligent Document Automation</span>
           </div>
           <button className="icon-button sidebar-close" type="button" onClick={() => setMenuOpen(false)} aria-label="Fechar menu">
             <X size={20} />
@@ -95,9 +97,9 @@ export default function AppShell({ pedidoState }) {
 
         <nav className="sidebar-nav" aria-label="Navegação principal">
           <span className="nav-section-label">Operação</span>
-          {navigation.slice(0, 4).map((item) => <NavItem key={item.to} {...item} />)}
+          {navigation.slice(0, 5).map((item) => <NavItem key={item.to} {...item} />)}
           <span className="nav-section-label">Administração</span>
-          {navigation.slice(4).map((item) => <NavItem key={item.to} {...item} />)}
+          {navigation.slice(5).map((item) => <NavItem key={item.to} {...item} />)}
         </nav>
 
         <div className="sidebar-footer">
@@ -113,7 +115,7 @@ export default function AppShell({ pedidoState }) {
               <Menu size={21} />
             </button>
             <div>
-              <p className="breadcrumb">ADI / {title}</p>
+              <p className="breadcrumb">Extracta / {title}</p>
               <h1>{title}</h1>
               <p>{description}</p>
             </div>

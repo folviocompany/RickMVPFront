@@ -35,7 +35,7 @@ export default function ProcessarPedido() {
         <div className="page-intro">
           <span className="eyebrow">Entrada de documento</span>
           <h2>Envie um pedido de compra</h2>
-          <p>O ADI lê o PDF, interpreta os itens com IA e prepara os dados para conferência e exportação.</p>
+          <p>O Extracta lê o PDF, interpreta os itens com IA e prepara os dados para conferência e exportação.</p>
         </div>
         <UploadZone onArquivo={processar} />
       </div>

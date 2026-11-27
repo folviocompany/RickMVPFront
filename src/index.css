@@ -182,6 +182,15 @@ h1, h2, h3, p { margin: 0; }
 .summary-item dd { margin: 5px 0 0; overflow: hidden; color: var(--slate-900); font-size: .86rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .summary-item span { display: block; margin-top: 2px; overflow: hidden; color: var(--slate-500); font-size: .7rem; text-overflow: ellipsis; white-space: nowrap; }
 .items-count { color: var(--slate-500); font-size: .75rem; }
+.extracta-upload, .extracta-order { padding: 20px; }
+.extracta-upload { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.extracta-order { border-top: 1px solid var(--slate-200); }
+.extracta-order > p { margin-top: 8px; color: var(--slate-600); }
+.extracta-totals { display: flex; flex-wrap: wrap; gap: 18px; padding: 18px 0; }
+.extracta-warning { padding: 10px 14px; margin-top: 8px; background: #fff7ed; color: #9a3412; border-radius: 8px; }
+.extracta-ack { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; }
+.extracta-audit { margin-top: 20px; overflow-wrap: anywhere; }
+.extracta-audit article { padding: 12px 0; border-top: 1px solid var(--slate-200); }
 
 .order-groups { padding: 18px; display: flex; flex-direction: column; gap: 18px; }
 .order-group { overflow: hidden; border: 1px solid var(--slate-200); border-radius: 12px; }

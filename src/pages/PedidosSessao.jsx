@@ -2,6 +2,7 @@ import { FileSearch } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import StatusBadge from '../components/StatusBadge'
+import ExtractaHistory from '../components/ExtractaHistory'
 import { calcularTotalPedido, calcularTotalPedidos, formatarMoeda } from '../utils/money'
 
 export default function PedidosSessao({ mode }) {
@@ -27,6 +28,8 @@ export default function PedidosSessao({ mode }) {
   }
 
   return (
+    <div className="page-stack">
+    {mode === 'historico' && <ExtractaHistory />}
     <section className="content-card">
       <div className="section-heading">
         <div>
@@ -76,5 +79,6 @@ export default function PedidosSessao({ mode }) {
         </div>
       )}
     </section>
+    </div>
   )
 }
